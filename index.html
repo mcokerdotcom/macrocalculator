@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans|Oswald" rel="stylesheet">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body,
+		input,
+		button,
+		textarea {
+			font-family: 'Open Sans', sans-serif;
+			-webkit-font-smoothing: antialiased;
+			line-height: 1;
+			font-size: 16px;
+			color: #444;
+		}
+
+		.page {
+			max-width: 960px;
+			width: 90%;
+			margin: auto;
+			padding: 2em 0;
+		}
+
+		.title {
+			font-family: Oswald, sans-serif;
+			letter-spacing: -0.5px;
+			color: #444;
+			letter-spacing: -0.5px;
+			font-weight: bold;
+			font-size: 1.5rem;
+			margin: 0 0 1rem;
+		}
+
+		.radio {
+			display: none;
+		}
+
+		.row:not(:last-child) {
+			margin: 0 0 2em;
+		}
+
+		.label {
+			margin: 0 0 0.5rem 0;
+			display: flex;
+			align-items: center;
+			cursor: pointer;
+		}
+
+		.multiHeight,
+		.label:before {
+			display: flex;
+			align-items: center;
+		}
+
+		.label:before {
+			height: 1rem;
+			width: 1rem;
+			content: '';
+			background: white;
+			border: 1px solid #444;
+			display: inline-flex;
+			justify-content: center;
+			margin-right: .5rem;
+			color: green;
+			font-weight: bold;
+			font-size: 2rem;
+			text-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+		}
+
+		.radio:checked+.label:before {
+			content: '\2713';
+		}
+
+		input[type="text"] {
+			padding: .5rem;
+			outline: 0;
+			border: 1px solid #444;
+			transition: box-shadow .25s;
+		}
+
+		input[name="unit"] {
+			margin: 0 .25rem 0 .75rem;
+		}
+
+
+		input[type="text"].error {
+			color: #cf000f;
+			border: 1px solid #cf000f;
+		}
+
+		.errorMsg {
+			display: none;
+			color: #cf000f;
+		}
+
+		.error+.errorMsg {
+			display: inline-block;
+		}
+
+		input[type="text"]:focus {
+			box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+		}
+
+		.panels {
+			display: flex;
+			border: 1px solid #ddd;
+		}
+
+		.panel {
+			flex: 1 0 50%;
+			background: #f3f3f3;
+			padding: 1rem;
+		}
+
+		.pageTitle {
+			margin: 0 0 1rem;
+			color: #cf000f;
+			position: relative;
+			font-size: 2.25rem;
+			line-height: 1.4;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.lineBehind span {
+			background: white;
+			padding: 0 1rem 0 0;
+		}
+
+		.lineBehind:after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background: #cf000f;
+			z-index: -1;
+		}
+
+		.outputVal {
+			padding: 0 0 0 .5rem;
+			opacity: 0;
+		}
+
+		button {
+			border: 1px solid #444;
+			background: #cf000f;
+			padding: .5rem;
+			color: white;
+			font-weight: bold;
+		}
+
+		.panel1 {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			background: #f9f9f9;
+		}
+
+		.ready .panel1 .title, .ready .outputVal {
+			opacity: 1;
+		}
+
+		.panel1 .title {
+			font-size: 2rem;
+			opacity: .5;
+		}
+
+		.panel1 .title, .outputVal {
+			transition: opacity .25s;
+		}
+
+		@media (max-width: 600px) {
+			.panels {
+				flex-direction: column;
+			}
+			.lineBehind:after {
+				display: none;
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="page">
+
+		<h1 class="title pageTitle lineBehind"><span>Calorie/Macro<span class="hidden">nutrient</span> Calculator</span></h1>
+
+		<h2></h2>
+
+		<div class="panels">
+			<form id="form" class="panel form">
+
+				<div class="row">
+					<h2 class="title">Sex:</h2>
+					<input type="radio" name="sex" value="male" id="male" checked class="radio"><label for="male" class="label">Male</label>
+					<input type="radio" name="sex" value="female" id="female" class="radio"><label for="female" class="label">Female</label>
+				</div>
+
+				<div class="row">
+					<h2 class="title multiHeight">Weight:
+						<input type="radio" name="unit" value="lbs" id="lbs" checked><label for="lbs">lbs</label>
+						<input type="radio" name="unit" value="kgs" id="kgs"><label for="kgs">kgs</label>
+					</h2>
+					<input type="text" name="weight" placeholder="enter your weight" id="weight" autofocus>
+					<div class="errorMsg">Enter your weight</div>
+				</div>
+
+				<div class="row">
+					<h2 class="title">Goal:</h2>
+					<input type="radio" name="goal" value="recomp" id="recomp" checked class="radio"><label for="recomp" class="label">Recomposition</label>
+					<input type="radio" name="goal" value="fat" id="loss" class="radio"><label for="loss" class="label">Fat Loss</label>
+					<input type="radio" name="goal" value="muscle" id="muscle" class="radio"><label for="muscle" class="label">Muscle Gain</label>
+				</div>
+
+				<div class="row">
+					<button type="submit">Submit</button>
+				</div>
+			</form>
+
+			<div id="results" class="panel panel1">
+				<div class="title">Calories: <span class="outputVal" id="calories"></span></div>
+				<div class="title">Fat: <span class="outputVal" id="fat"></span></div>
+				<div class="title">Carbs: <span class="outputVal" id="carbs"></span></div>
+				<div class="title">Protein: <span class="outputVal" id="protein"></span></div>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		$(function () {
+			$('#form').on('submit', function (e) {
+				e.preventDefault();
+
+				var values = $(this).serializeArray(),
+					sex = values[0].value,
+					unit = values[1].value,
+					weight = parseFloat(values[2].value),
+					goal = values[3].value,
+					calories = '',
+					protein = '',
+					carbs = '',
+					fat = '',
+					$panels = $('.panels'),
+					$outputVals = $('.outputVal'),
+					$weightInput = $('[name="weight"]');
+
+				$panels.removeClass('ready');
+
+				if (isNaN($.trim(weight))) {
+					$weightInput.addClass('error');
+					return false;
+				} else {
+					$weightInput.removeClass('error');
+				}
+
+				if (unit == 'kgs') {
+					weight = weight * 2.20462;
+				}
+
+				if (sex == 'male') {
+					if (goal == 'recomp') {
+						calories = 12.75,
+							protein = 1.15,
+							carbs = 1.25,
+							fat = 0.35;
+					} else if (goal == 'fat') {
+						calories = 11.43,
+							protein = 1.25,
+							carbs = 1,
+							fat = 0.27;
+					} else {
+						calories = 16.9,
+							protein = 1.1,
+							carbs = 2,
+							fat = 0.5;
+					}
+				} else {
+					if (goal == 'recomp') {
+						calories = 12.62,
+							protein = 1.1,
+							carbs = 1.2,
+							fat = 0.38;
+					} else if (goal == 'fat') {
+						calories = 11.35,
+							protein = 1.15,
+							carbs = 0.9,
+							fat = 0.35;
+					} else {
+						calories = 14.9,
+							protein = 1,
+							carbs = 1.6,
+							fat = 0.5;
+					}
+				}
+
+				$('#calories').html(parseInt(weight * calories) + 'g');
+				$('#fat').html(parseInt(weight * fat) + 'g');
+				$('#carbs').html(parseInt(weight * carbs) + 'g');
+				$('#protein').html(parseInt(weight * protein) + 'g');
+
+				$panels.addClass('ready');
+
+				if ($(window).width() <= 600) {
+					$('html, body').animate({scrollTop: $("#results").offset().top}, 500);
+				}
+			})
+		});
+	</script>
+
+</body>
+
+</html>
